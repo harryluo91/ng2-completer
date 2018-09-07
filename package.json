@@ -16,7 +16,8 @@
     "compodoc": "compodoc -p tsconfig.json",
     "compodoc-serve": "compodoc -s",
     "start": "cross-env webpack-dev-server --inline --progress --port 8080",
-    "deploy:gh-pages": "npm run build:demo:prod && cross-env ./node_modules/.bin/gh-pages -d dist/demo"
+    "deploy:gh-pages": "npm run build:demo:prod && cross-env ./node_modules/.bin/gh-pages -d dist/demo",
+    "prepare": "npm run build"
   },
   "typings": "./ng2-completer.d.ts",
   "keywords": [
