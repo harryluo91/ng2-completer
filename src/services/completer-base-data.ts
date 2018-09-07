@@ -87,10 +87,10 @@ export abstract class CompleterBaseData extends Subject<CompleterItem[] | null> 
         if (this._searchFields !== null && this._searchFields !== undefined && term !== "" && data.length > 0) {
             matches = data.filter((item) => {
                 const values: any[] = searchFields ? this.extractBySearchFields(searchFields, item) : [item];
-                return values.some((value) => value
+                return values.some((value) => term
                     .toString()
                     .toLowerCase()
-                    .indexOf(term.toString().toLowerCase()) >= 0
+                    .indexOf(value.toString().toLowerCase()) >= 0
                 );
             });
         } else if (searchFields && searchFields.length > 0 && data[searchFields[0]]) {
