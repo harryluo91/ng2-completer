@@ -57,7 +57,11 @@ export abstract class CompleterBaseData extends Subject<CompleterItem[] | null> 
         }
 
         if (this._descriptionField) {
-            formattedDesc = this.extractValue(data, this._descriptionField);
+            formattedDesc = this.extractDescription(data);
+        }
+
+        if (typeof formattedDesc !== "string") {
+            formattedDesc = JSON.stringify(formattedDesc);
         }
 
         if (this._imageField) {
@@ -79,8 +83,8 @@ export abstract class CompleterBaseData extends Subject<CompleterItem[] | null> 
 
     protected extractMatches(data: any[], term: string) {
         let matches: any[] = [];
-        const searchFields = this._searchFields ? this._searchFields.split(",") : null;
-        if (this._searchFields !== null && this._searchFields !== undefined && term !== "") {
+        const searchFields: any[] | null = this._searchFields ? this._searchFields.split(",") : null;
+        if (this._searchFields !== null && this._searchFields !== undefined && term !== "" && data.length > 0) {
             matches = data.filter((item) => {
                 const values: any[] = searchFields ? this.extractBySearchFields(searchFields, item) : [item];
                 return values.some((value) => value
@@ -89,6 +93,8 @@ export abstract class CompleterBaseData extends Subject<CompleterItem[] | null> 
                     .indexOf(term.toString().toLowerCase()) >= 0
                 );
             });
+        } else if (searchFields && searchFields.length > 0 && data[searchFields[0]]) {
+            matches.push(data);
         } else {
             matches = data;
         }
@@ -103,6 +109,19 @@ export abstract class CompleterBaseData extends Subject<CompleterItem[] | null> 
         }
 
         return this._titleField.split(",")
+            .map((field) => {
+                return this.extractValue(item, field);
+            })
+            .reduce((acc, titlePart) => acc ? `${acc} ${titlePart}` : titlePart);
+    }
+
+    protected extractDescription(item: any) {
+        // split title fields and run extractValue for each and join with ' '
+        if (!this._descriptionField) {
+            return "";
+        }
+
+        return this._descriptionField.split(",")
             .map((field) => {
                 return this.extractValue(item, field);
             })
