@@ -2,9 +2,9 @@
   "name": "ng2-completer",
   "version": "3.0.0-beta.1",
   "description": "ng2 autocomplete/typeahead component",
-  "main": ".dist/lib/bundles/ng2-completer.umd.js",
-  "module": "./esm5/ng2-completer.js",
-  "es2015": "./esm2015/ng2-completer.js",
+  "main": "./dist/lib/bundles/ng2-completer.umd.js",
+  "module": "./dist/lib/esm5/ng2-completer.js",
+  "es2015": "./dist/lib//esm2015/ng2-completer.js",
   "scripts": {
     "build": "node build.js",
     "build:demo:dev": "cross-env webpack --progress --color",
@@ -19,7 +19,7 @@
     "deploy:gh-pages": "npm run build:demo:prod && cross-env ./node_modules/.bin/gh-pages -d dist/demo",
     "prepare": "npm run build"
   },
-  "typings": "./ng2-completer.d.ts",
+  "typings": "./dist/lib//ng2-completer.d.ts",
   "keywords": [
     "angular2",
     "autcomplete",
