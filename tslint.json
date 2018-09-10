@@ -29,6 +29,8 @@
             ],
             "kebab-case"
         ],
+        "interface-name": false,
+        "max-classes-per-file": false,
         "use-input-property-decorator": true,
         "use-output-property-decorator": true,
         "use-host-property-decorator": true,
@@ -47,10 +49,6 @@
         "component-class-suffix": [
             true,
             "Component"
-        ],
-        "directive-class-suffix": [
-            true,
-            "Directive"
         ],
         "ordered-imports": [
             false

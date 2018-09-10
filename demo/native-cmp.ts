@@ -1,7 +1,8 @@
 "use strict";
 import { Component, ViewChild } from "@angular/core";
 
-import { Observable, from } from "rxjs";
+import { from } from "rxjs";
+import { delay } from "rxjs/operators";
 
 import {
     CompleterCmp,
@@ -12,7 +13,6 @@ import {
 } from "../src/ng2-completer";
 import { CustomData } from "./custom-data";
 import { HttpClient } from "@angular/common/http";
-import { delay } from "rxjs/operators";
 
 let template = require("./native-cmp.html");
 let style = require("./native-cmp.css");
@@ -78,6 +78,7 @@ export class NativeCmp {
     public dataRemote2: RemoteData;
     public dataService3: CompleterData;
     public dataService4: CompleterData;
+    public dataService5: CompleterData;
     public customData: CustomData;
     public isOpen: boolean = false;
 
@@ -101,10 +102,11 @@ export class NativeCmp {
         this.dataRemote2.dataField("results");
         // For async local the source can also be HTTP request
         // let source = http.get("https://raw.githubusercontent.com/oferh/ng2-completer/master/demo/res/data/countries.json?").map((res: any) => res.json());
-        let source = from([this.countries]).pipe(delay(3000));
+        const source = from([this.countries]).pipe(delay(3000));
         this.dataService3 = completerService.local(source, "name", "name");
         this.customData = new CustomData(http);
         this.dataService4 = completerService.local(this.colors, null, null);
+        this.dataService5 = completerService.local(this.colors, null, null);
     }
 
     public onCountrySelected(selected: CompleterItem) {

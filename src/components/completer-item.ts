@@ -3,4 +3,4 @@ export interface CompleterItem {
     description?: string;
     image?: string;
     originalObject: any;
-};
+}

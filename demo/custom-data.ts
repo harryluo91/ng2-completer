@@ -10,10 +10,14 @@ export class CustomData extends Subject<CompleterItem[]> implements CompleterDat
     }
     public search(term: string): void {
         this.http.get("http://mysafeinfo.com/api/data?list=seinfeldepisodes&format=json&nm=" + term + ",contains")
-            .pipe(map(data => {
-                let matches = (<Array<any>>data).map((episode: any) => this.convertToItem(episode)).filter(episode => !!episode) as CompleterItem[];
-                this.next(matches);
-            }))
+            .pipe(
+                map((data: any) => {
+                    const matches = (data)
+                        .map((episode: any) => this.convertToItem(episode))
+                        .filter((episode: CompleterItem | null) => !!episode) as CompleterItem[];
+                    this.next(matches);
+                })
+            )
             .subscribe();
     }
 

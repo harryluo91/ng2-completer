@@ -1,12 +1,20 @@
-import { ChangeDetectorRef, Directive, EmbeddedViewRef, Host, Input, OnInit, TemplateRef, ViewContainerRef } from "@angular/core";
+import {
+    ChangeDetectorRef,
+    Directive,
+    EmbeddedViewRef,
+    Host,
+    Input,
+    OnInit,
+    TemplateRef,
+    ViewContainerRef,
+    NgZone
+} from "@angular/core";
 import { Subscription, timer } from "rxjs";
 import { take } from "rxjs/operators";
-
-import { CtrCompleter, CompleterList } from "./ctr-completer";
-import { CompleterData } from "../services/completer-data";
 import { CompleterItem } from "../components/completer-item";
-import { MIN_SEARCH_LENGTH, PAUSE, CLEAR_TIMEOUT, isNil } from "../globals";
-
+import { CLEAR_TIMEOUT, isNil, MIN_SEARCH_LENGTH, PAUSE } from "../globals";
+import { CompleterData } from "../services/completer-data";
+import { CompleterList, CtrCompleter } from "./ctr-completer";
 
 export class CtrListContext {
     constructor(
@@ -41,7 +49,8 @@ export class CtrList implements OnInit, CompleterList {
         @Host() private completer: CtrCompleter,
         private templateRef: TemplateRef<CtrListContext>,
         private viewContainer: ViewContainerRef,
-        private cd: ChangeDetectorRef) { }
+        private cd: ChangeDetectorRef,
+        private zone: NgZone) { }
 
     public ngOnInit() {
         this.completer.registerList(this);
@@ -60,7 +69,7 @@ export class CtrList implements OnInit, CompleterList {
     @Input("ctrListInitialValue")
     public set initialValue(value: any) {
         if (this._dataService && typeof this._dataService.convertToItem === "function") {
-            setTimeout(() => {
+            this.zone.run(() => {
                 const initialItem = this._dataService && this._dataService.convertToItem!(value);
                 if (initialItem) {
                     this.completer.onSelected(initialItem, false);
@@ -167,14 +176,20 @@ export class CtrList implements OnInit, CompleterList {
         }
 
         // First try to find the exact term
-        let bestMatch = this.ctx.results.findIndex(item => item.title.toLowerCase() === this.term!.toLocaleLowerCase());
+        let bestMatch = this.ctx.results.findIndex(
+            (item) => item.title.toLowerCase() === this.term!.toLocaleLowerCase()
+        );
         // If not try to find the first item that starts with the term
         if (bestMatch < 0) {
-            bestMatch = this.ctx.results.findIndex(item => item.title.toLowerCase().startsWith(this.term!.toLocaleLowerCase()));
+            bestMatch = this.ctx.results.findIndex(
+                (item) => item.title.toLowerCase().startsWith(this.term!.toLocaleLowerCase())
+            );
         }
         // If not try to find the first item that includes the term
         if (bestMatch < 0) {
-            bestMatch = this.ctx.results.findIndex(item => item.title.toLowerCase().includes(this.term!.toLocaleLowerCase()));
+            bestMatch = this.ctx.results.findIndex(
+                (item) => item.title.toLowerCase().includes(this.term!.toLocaleLowerCase())
+            );
         }
 
         return bestMatch < 0 ? null : bestMatch;
@@ -183,16 +198,26 @@ export class CtrList implements OnInit, CompleterList {
     private dataServiceSubscribe() {
         if (this._dataService) {
             this._dataService
-                .subscribe(results => {
+                .subscribe((results) => {
                     this.ctx.searchInitialized = true;
                     this.ctx.searching = false;
                     this.ctx.results = results;
 
-                    if (this.ctrListAutoMatch && results && results.length === 1 && results[0].title && !isNil(this.term) &&
-                        results[0].title.toLocaleLowerCase() === this.term!.toLocaleLowerCase()) {
+                    if (
+                        this.ctrListAutoMatch && results &&
+                        results.length === 1 && results[0].title &&
+                        !isNil(this.term) &&
+                        results[0].title.toLocaleLowerCase() === this.term!.toLocaleLowerCase()
+                    ) {
                         // Do automatch
                         this.completer.onSelected(results[0]);
                         return;
+                    }
+
+                    this.refreshTemplate();
+
+                    if (this.ctrListAutoHighlight) {
+                        this.completer.autoHighlightIndex = this.getBestMatchIndex();
                     }
                 },
                     (error: any) => {

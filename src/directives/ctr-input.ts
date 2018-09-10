@@ -71,7 +71,7 @@ export class CtrInput {
         });
 
         if (this.ngModel.valueChanges) {
-            this.ngModel.valueChanges.subscribe(value => {
+            this.ngModel.valueChanges.subscribe((value: any) => {
                 if (!isNil(value) && this._displayStr !== value) {
                     if (this.searchStr !== value) {
                         this.completer.search(value);
@@ -91,12 +91,10 @@ export class CtrInput {
 
         if (event.keyCode === KEY_UP || event.keyCode === KEY_EN) {
             event.preventDefault();
-        }
-        else if (event.keyCode === KEY_DW) {
+        } else if (event.keyCode === KEY_DW) {
             event.preventDefault();
             this.completer.search(this.searchStr);
-        }
-        else if (event.keyCode === KEY_ES) {
+        } else if (event.keyCode === KEY_ES) {
             if (this.completer.isOpen) {
                 this.restoreSearchValue();
                 this.completer.clear();

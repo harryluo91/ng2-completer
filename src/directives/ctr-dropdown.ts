@@ -1,9 +1,8 @@
-import { AfterViewInit, Directive, ElementRef, Host, HostListener, OnDestroy } from "@angular/core";
+import { AfterViewInit, Directive, ElementRef, Host, HostListener, OnDestroy, NgZone } from "@angular/core";
 
 import { CompleterItem } from "../components/completer-item";
 import { CtrCompleter, CompleterDropdown } from "./ctr-completer";
 import { isNil } from "../globals";
-
 
 export interface CtrRowElement {
     setHighlighted(selected: boolean): void;
@@ -25,7 +24,7 @@ export class CtrDropdown implements CompleterDropdown, OnDestroy, AfterViewInit 
     private isScrollOn: boolean = false;
     private _rowMouseDown: boolean = false;
 
-    constructor( @Host() private completer: CtrCompleter, private el: ElementRef) {
+    constructor( @Host() private completer: CtrCompleter, private el: ElementRef, private zone: NgZone) {
         this.completer.registerDropdown(this);
     }
 
@@ -39,11 +38,10 @@ export class CtrDropdown implements CompleterDropdown, OnDestroy, AfterViewInit 
 
         this.isScrollOn = !!css.maxHeight && css.overflowY === "auto";
         if (autoHighlightIndex) {
-            setTimeout(
+            this.zone.run(
                 () => {
                     this.highlightRow(autoHighlightIndex);
-                },
-                0
+                }
             );
         }
     }
@@ -52,11 +50,10 @@ export class CtrDropdown implements CompleterDropdown, OnDestroy, AfterViewInit 
         // Support for canceling blur on IE (issue #158)
         if (!this._rowMouseDown) {
             this.completer.cancelBlur(true);
-            setTimeout(
+            this.zone.run(
                 () => {
                     this.completer.cancelBlur(false);
-                },
-                0
+                }
             );
         } else {
             this._rowMouseDown = false;
